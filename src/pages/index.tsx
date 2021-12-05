@@ -27,12 +27,6 @@ type HomeProps = {
   courses?: Course[];
 }
 
-
-// without using Auth or token for now
-const mockStudent = {
-  id: 'ef18b012-cd56-466c-ab06-6e002d575f9c'
-}
-
 const Home: NextPage<HomeProps> = ({ courses = [] }) => {
   const [myCourses, setMyCourses] = useState<Course[]>([]);
 
@@ -67,6 +61,8 @@ const Home: NextPage<HomeProps> = ({ courses = [] }) => {
 
   const handleSelectCourse = async (course: Course) => {
     try {
+      const userData = getCurrentUserData();
+
       await client.mutate({
         mutation: gql`
           mutation updateStudent($data: UpdateStudentInput!) {
@@ -79,7 +75,7 @@ const Home: NextPage<HomeProps> = ({ courses = [] }) => {
         `,
         variables: {
           data: {
-            id: mockStudent.id,
+            id: userData?.student.id,
             courses: [course.id]
           }
         },
@@ -93,6 +89,8 @@ const Home: NextPage<HomeProps> = ({ courses = [] }) => {
 
   const handleRemoveCourse = async (course: Course) => {
     try {
+      const userData = getCurrentUserData();
+
       await client.mutate({
         mutation: gql`
           mutation removeStudentCourse($data: RemoveStudentCourseInput!) {
@@ -103,7 +101,7 @@ const Home: NextPage<HomeProps> = ({ courses = [] }) => {
         `,
         variables: {
           data: {
-            studentId: mockStudent.id,
+            studentId: userData?.student.id,
             courseId: course.id,
           }
         },

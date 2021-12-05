@@ -6,35 +6,9 @@ import gql from "graphql-tag";
 import { NextPage } from "next";
 import Router from "next/router";
 import { FormEvent, useState } from "react";
+import { PasswordInput } from "../components/PasswordInput";
 import { client } from "../services/graphql";
 import { setCurrentUserData } from "../utils/user";
-
-type PasswordInputProps = {
-  value: string | undefined;
-  onChange: (value: string) => void;
-}
-
-function PasswordInput({ value, onChange }: PasswordInputProps) {
-  const [show, setShow] = useState(false)
-  const handleClick = () => setShow(!show)
-
-  return (
-    <InputGroup size='md'>
-      <Input
-        pr='4.5rem'
-        type={show ? 'text' : 'password'}
-        placeholder='Enter password'
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      />
-      <InputRightElement width='4.5rem'>
-        <Button h='1.75rem' size='sm' onClick={handleClick}>
-          {show ? 'Hide' : 'Show'}
-        </Button>
-      </InputRightElement>
-    </InputGroup>
-  )
-}
 
 const Login: NextPage = () => {
   const toast = useToast();
@@ -69,7 +43,7 @@ const Login: NextPage = () => {
       const { auth } = data;
 
       setCurrentUserData(auth);
-      
+
       Router.push("/");
     } catch(error: any) {
       console.error(JSON.stringify(error));
@@ -101,6 +75,7 @@ const Login: NextPage = () => {
             value={email}
             onChange={(event) => setEmail(event.target.value)} 
           />
+          
           <PasswordInput value={password} onChange={setPassword}/>
 
           <Button type="submit">Sign in</Button>

@@ -25,11 +25,13 @@ import gql from "graphql-tag";
 import { useDisclosure } from '@chakra-ui/hooks'
 import { FormEvent, useEffect, useState } from "react";
 import { client } from "../services/graphql";
+import { PasswordInput } from "./PasswordInput";
 
 type Student = {
   id: string;
   name: string;
   email: string;
+  password: string;
 }
 
 const Students = () => {
@@ -58,7 +60,7 @@ const Students = () => {
   }, [])
 
   const openStudentModal = (student?: Student) => {
-    setStudent(student ? student : { name: '', email: '' });
+    setStudent(student ? student : { name: '', email: '', password: '' });
 
     onOpen();
   }
@@ -135,6 +137,8 @@ const Students = () => {
       })
     }
 
+    Object.assign(variables.data, { password: student.password })
+
     return client.mutate({
       mutation: gql`
         mutation createStudent($data: CreateStudentInput!) {
@@ -210,6 +214,19 @@ const Students = () => {
                 value={student?.email || ''}
                 onChange={(event) => setStudent({ ...student, email: event.target.value })}
               />
+
+              { !student?.id && (
+                <>
+                  <FormLabel htmlFor='password'>Password</FormLabel>
+                  <PasswordInput
+                    id="password"
+                    placeholder='Please enter a e-mail'
+                    value={student?.password || ''}
+                    onChange={(text) => setStudent({ ...student, password: text })}
+                  />
+                </>
+              )}
+    
             </form>
           </ModalBody>
 
