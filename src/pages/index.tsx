@@ -12,9 +12,11 @@ import {
 } from '@chakra-ui/react'
 import gql from 'graphql-tag'
 import type { NextPage } from 'next'
+import Router from 'next/router';
 import { useEffect, useState } from 'react'
 import CourseItem from '../components/CourseItem'
 import { client } from '../services/graphql'
+import { getCurrentUserData } from '../utils/user'
 
 type Course = {
   id: string
@@ -35,22 +37,29 @@ const Home: NextPage<HomeProps> = ({ courses = [] }) => {
   const [myCourses, setMyCourses] = useState<Course[]>([]);
 
   useEffect(() => {
+    const userData = getCurrentUserData();
+
+    if(!userData) {
+      Router.push('/login');
+      return;
+    }
+
     client.query({
       query: gql`
-        query student($id: String!) {
-          student(id: $id) {
-            courses {
-              id
-              name
-            }
+        query myCourses {
+          courses: myCourses {
+            id
+            name
           }
         }
       `,
-      variables: {
-        id: mockStudent.id,
+      context: {
+        headers: {
+          authorization: `Bearer ${userData.token}`
+        }
       }
     }).then(({ data }) => {
-      setMyCourses(data.student?.courses || []);
+      setMyCourses(data.courses || []);
     }).catch((error: any) => {
       console.error(JSON.stringify(error));
     })
